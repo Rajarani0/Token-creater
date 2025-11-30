@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <!-- YE LINE ZAROORI HAI MOBILE KE LIYE -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>BSC Token Creator</title>
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.8.0/dist/web3.min.js"></script>
+  <style>
+    :root {
+      --primary: #00d1ff;
+      --bg: #0f0f23;
+      --card: #1a1a2e;
+      --input-bg: #16213e;
+      --text: #fff;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; width: 100%; overflow-x: hidden; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 20px;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+      padding-bottom: 30px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    h1 {
+      font-size: 2.4rem;
+      color: var(--primary);
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    header p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+
+    .connect-wallet {
+      text-align: center;
+      margin: 30px 0;
+    }
+
+    button {
+      background: var(--primary);
+      color: #000;
+      border: none;
+      padding: 18px 32px;
+      border-radius: 16px;
+      font-weight: bold;
+      font-size: 1.3rem;
+      cursor: pointer;
+      width: 100%;
+      max-width: 400px;
+      transition: 0.3s;
+      box-shadow: 0 4px 15px rgba(0, 209, 255, 0.3);
+    }
+
+    button:hover { background: #00a8cc; }
+    button:disabled { background: #555; opacity: 0.7; }
+
+    .fee-info {
+      background: var(--input-bg);
+      padding: 18px;
+      border-radius: 16px;
+      text-align: center;
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin: 25px 0;
+      border: 2px solid var(--primary);
+    }
+
+    .form-section, .tokens-section {
+      background: var(--card);
+      padding: 25px;
+      border-radius: 20px;
+      margin: 25px 0;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+    }
+
+    h2 {
+      font-size: 1.6rem;
+      color: var(--primary);
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 10px;
+      font-weight: 600;
+      color: var(--primary);
+      font-size: 1.1rem;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 16px;
+      background: var(--input-bg);
+      border: 2px solid var(--primary);
+      border-radius: 14px;
+      color: var(--text);
+      font-size: 1.1rem;
+      transition: 0.3s;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: #00a8cc;
+      box-shadow: 0 0 0 3px rgba(0, 209, 255, 0.2);
+    }
+
+    .full-width {
+      grid-column: 1 / -1;
+    }
+
+    .create-btn {
+      background: #51cf66;
+      color: white;
+      font-size: 1.3rem;
+      padding: 20px;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+
+    .create-btn:disabled {
+      background: #888;
+    }
+
+    .tx-status {
+      margin-top: 15px;
+      font-size: 1.1rem;
+      text-align: center;
+      min-height: 30px;
+      font-weight: 600;
+    }
+
+    .token-list {
+      margin-top: 15px;
+    }
+
+    .token-card {
+      background: var(--input-bg);
+      padding: 18px;
+      border-radius: 16px;
+      margin-bottom: 14px;
+      border: 1px solid var(--primary);
+    }
+
+    .token-card strong {
+      font-size: 1.2rem;
+      color: var(--primary);
+    }
+
+    .token-card code {
+      font-size: 0.9rem;
+      display: block;
+      margin: 8px 0;
+      word-break: break-all;
+    }
+
+    .token-card a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    .loading { color: var(--primary); font-style: italic; }
+    .error { color: #ff6b6b; }
+    .success { color: #51cf66; }
+
+    footer {
+      text-align: center;
+      padding: 30px 0;
+      color: #777;
+      font-size: 0.95rem;
+    }
+
+    footer a {
+      color: var(--primary);
+    }
+
+    /* Mobile Only */
+    @media (max-width: 768px) {
+      body { padding: 15px; font-size: 17px; }
+      .form-grid { grid-template-columns: 1fr; gap: 20px; }
+      h1 { font-size: 2.2rem; }
+      h2 { font-size: 1.5rem; }
+      button, .create-btn { font-size: 1.3rem; padding: 20px; }
+      input, select { font-size: 1.15rem; padding: 18px; }
+      .fee-info { font-size: 1.15rem; }
+    }
+
+    @media (max-width: 480px) {
+      body { padding: 10px; }
+      h1 { font-size: 2rem; }
+      .container { padding: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Creator</h1>
+      <p>Create BEP-20 tokens instantly on Binance Smart Chain</p>
+    </header>
+
+    <div class="connect-wallet">
+      <button id="connectBtn">Connect Wallet</button>
+      <p id="account" class="tx-status"></p>
+    </div>
+
+    <div class="fee-info">
+      Token Creation Fee: <span id="creationFee">Loading...</span>
+    </div>
+
+    <div class="form-section">
+      <h2>Create New Token</h2>
+      <div class="form-grid">
+        <div>
+          <label>Token Name</label>
+          <input type="text" id="tokenName" placeholder="My Token" />
+        </div>
+        <div>
+          <label>Token Symbol</label>
+          <input type="text" id="tokenSymbol" placeholder="MTK" />
+        </div>
+        <div>
+          <label>Initial Supply</label>
+          <input type="number" id="initialSupply" placeholder="1000000" />
+        </div>
+        <div>
+          <label>Decimals</label>
+          <select id="decimals">
+            <option value="18">18 (Recommended)</option>
+            <option value="9">9</option>
+            <option value="6">6</option>
+          </select>
+        </div>
+        <div class="full-width">
+          <button id="createBtn" class="create-btn" disabled>Create Token (Pay Fee)</button>
+          <p id="txStatus" class="tx-status"></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="tokens-section">
+      <h2>All Created Tokens</h2>
+      <div id="allTokensList" class="token-list">
+        <p class="loading">Loading tokens...</p>
+      </div>
+    </div>
+
+    <div class="tokens-section">
+      <h2>My Tokens</h2>
+      <div id="myTokensList" class="token-list">
+        <p class="loading">Connect wallet to view</p>
+      </div>
+    </div>
+
+    <footer>
+      Contract: <code>0xf652847AB10d72899ACcD2e78E61B386c1444D8c</code><br>
+      <a href="https://bscscan.com/address/0xf652847AB10d72899ACcD2e78E61B386c1444D8c" target="_blank">View on BSCScan</a>
+    </footer>
+  </div>
+
+  <script>
+    const contractAddress = "0xf652847AB10d72899ACcD2e78E61B386c1444D8c";
+    const abi = [/* Paste full ABI here */];
+
+    const verifiedABI = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint256","name":"newFee","type":"uint256"}],"name":"FeeUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"FeesWithdrawn","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"tokenAddress","type":"address"},{"indexed":true,"internalType":"address","name":"creator","type":"address"},{"indexed":false,"internalType":"string","name":"name","type":"string"},{"indexed":false,"internalType":"string","name":"symbol","type":"string"},{"indexed":false,"internalType":"uint256","name":"initialSupply","type":"uint256"},{"indexed":false,"internalType":"uint8","name":"decimals","type":"uint8"}],"name":"TokenCreated","type":"event"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"allTokens","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"string","name":"tokenName","type":"string"},{"internalType":"string","name":"tokenSymbol","type":"string"},{"internalType":"uint256","name":"initialSupply","type":"uint256"},{"internalType":"uint8","name":"dec","type":"uint8"}],"name":"createToken","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"payable","type":"function"},{"inputs":[],"name":"creationFee","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"},{"internalType":"uint256","name":"","type":"uint256"}],"name":"creatorTokens","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getAllTokens","outputs":[{"internalType":"address[]","name":"","type":"address[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"creator","type":"address"}],"name":"getTokensByCreator","outputs":[{"internalType":"address[]","name":"","type":"address[]"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"newFee","type":"uint256"}],"name":"updateFee","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"withdrawFees","outputs":[],"stateMutability":"nonpayable","type":"function"}];
+
+    let web3, contract, accounts;
+    const connectBtn = document.getElementById("connectBtn");
+    const accountDisplay = document.getElementById("account");
+    const createBtn = document.getElementById("createBtn");
+    const txStatus = document.getElementById("txStatus");
+    const creationFeeSpan = document.getElementById("creationFee");
+
+    async function switchToBSC() {
+      try {
+        await ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x38' }] });
+      } catch (error) {
+        if (error.code === 4902) {
+          await ethereum.request({
+            method: 'wallet_addEthereumChain',
+            params: [{
+              chainId: '0x38', chainName: 'Binance Smart Chain', nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 },
+              rpcUrls: ['https://bsc-dataseed.binance.org/'], blockExplorerUrls: ['https://bscscan.com']
+            }]
+          });
+        }
+      }
+    }
+
+    async function connectWallet() {
+      if (!window.ethereum) return alert("MetaMask is required!");
+      try {
+        await switchToBSC();
+        accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+        web3 = new Web3(window.ethereum);
+        contract = new web3.eth.Contract(verifiedABI, contractAddress);
+        accountDisplay.innerHTML = `<strong>Connected:</strong> \( {accounts[0].slice(0,8)}... \){accounts[0].slice(-6)}`;
+        connectBtn.innerText = "Connected"; connectBtn.disabled = true; createBtn.disabled = false;
+        await loadFee(); await loadAllTokens(); await loadMyTokens();
+      } catch (err) { alert("Connection failed: " + err.message); }
+    }
+
+    async function loadFee() {
+      try {
+        const fee = await contract.methods.creationFee().call();
+        creationFeeSpan.innerText = `${web3.utils.fromWei(fee, 'ether')} BNB`;
+      } catch (err) {
+        creationFeeSpan.innerHTML = `<span class="error">Fee not set</span>`;
+      }
+    }
+
+    createBtn.onclick = async () => {
+      const name = document.getElementById("tokenName").value.trim();
+      const symbol = document.getElementById("tokenSymbol").value.trim().toUpperCase();
+      const supply = document.getElementById("initialSupply").value;
+      const dec = document.getElementById("decimals").value;
+      if (!name || !symbol || !supply) return txStatus.innerHTML = "<span class='error'>Please fill all fields</span>";
+      txStatus.innerHTML = "<span class='loading'>Creating token...</span>";
+      try {
+        const fee = await contract.methods.creationFee().call();
+        const tx = await contract.methods.createToken(name, symbol, supply, dec).send({ from: accounts[0], value: fee, gas: 3000000 });
+        txStatus.innerHTML = `<span class='success'>Token Created! <a href="https://bscscan.com/tx/${tx.transactionHash}" target="_blank">View Tx</a></span>`;
+        loadAllTokens(); loadMyTokens();
+      } catch (err) { txStatus.innerHTML = `<span class='error'>Failed: ${err.message.split('(')[0]}</span>`; }
+    };
+
+    async function loadAllTokens() {
+      const list = document.getElementById("allTokensList");
+      try {
+        const tokens = await contract.methods.getAllTokens().call();
+        if (tokens.length === 0) return list.innerHTML = "<p>No tokens created yet.</p>";
+        list.innerHTML = "";
+        for (let addr of tokens) {
+          const token = new web3.eth.Contract([{"inputs":[],"name":"name","outputs":[{"type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalSupply","outputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"decimals","outputs":[{"type":"uint8"}],"stateMutability":"view","type":"function"}], addr);
+          try {
+            const [n, s, sup, d] = await Promise.all([token.methods.name().call(), token.methods.symbol().call(), token.methods.totalSupply().call(), token.methods.decimals().call()]);
+            list.innerHTML += `<div class="token-card"><strong>\( {n} ( \){s})</strong><br>Supply: \( {(sup/(10**d)).toLocaleString()}<br><code> \){addr}</code><br><a href="https://bscscan.com/address/${addr}" target="_blank">View on BSCScan</a></div>`;
+          } catch {}
+        }
+      } catch { list.innerHTML = "<p class='error'>Failed to load tokens</p>"; }
+    }
+
+    async function loadMyTokens() {
+      const list = document.getElementById("myTokensList");
+      if (!accounts) return;
+      try {
+        const tokens = await contract.methods.getTokensByCreator(accounts[0]).call();
+        if (tokens.length === 0) return list.innerHTML = "<p>You have no tokens.</p>";
+        list.innerHTML = "";
+        for (let addr of tokens) {
+          const token = new web3.eth.Contract([{"inputs":[],"name":"name","outputs":[{"type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"type":"string"}],"stateMutability":"view","type":"function"}], addr);
+          const [n, s] = await Promise.all([token.methods.name().call(), token.methods.symbol().call()]);
+          list.innerHTML += `<div class="token-card"><strong>\( {n} ( \){s})</strong><br><code>\( {addr}</code><br><a href="https://bscscan.com/address/ \){addr}" target="_blank">View on BSCScan</a></div>`;
+        }
+      } catch { list.innerHTML = "<p class='error'>Failed to load your tokens</p>"; }
+    }
+
+    connectBtn.onclick = connectWallet;
+    window.onload = () => { if (window.ethereum?.selectedAddress) connectWallet(); };
+  </script>
+</body>
+</html>
